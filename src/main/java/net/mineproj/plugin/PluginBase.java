@@ -3,11 +3,14 @@ package net.mineproj.plugin;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
+import net.mineproj.plugin.api.core.AsyncScheduler;
 import net.mineproj.plugin.api.data.ProtocolPlugin;
 import net.mineproj.plugin.api.listeners.ActionListener;
 import net.mineproj.plugin.api.listeners.BlockPlaceFixerListener;
 import net.mineproj.plugin.api.listeners.MovementListener;
 import net.mineproj.plugin.api.listeners.VelocityListener;
+import net.mineproj.plugin.functionality.logic.Ticker;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PluginBase extends JavaPlugin {
@@ -21,10 +24,21 @@ public final class PluginBase extends JavaPlugin {
      */
     public final static boolean protocolAnalyzer = true;
 
+    /*
+    Process advanced physics (such as ballistics)
+    through the physics handler every tick.
+    Consumes resources, turn it off if you don't need it
+     */
+    public final static boolean physProcessor = true;
+
     @Override
     public void onEnable() {
         instance = this;
         this.runListeners();
+        this.runPhys();
+        { // Your logic
+
+        }
     }
 
     @Override
@@ -45,5 +59,10 @@ public final class PluginBase extends JavaPlugin {
 
         // Goofy
         m.addPacketListener(new BlockPlaceFixerListener());
+    }
+    private void runPhys() {
+        if (!physProcessor) return;
+        Bukkit.getScheduler().runTaskTimer(this,
+                        () -> AsyncScheduler.run(Ticker::run), 0L, 1L);
     }
 }

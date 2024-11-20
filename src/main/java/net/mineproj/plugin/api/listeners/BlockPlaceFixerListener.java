@@ -7,6 +7,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.api.data.PlayerProtocol;
 import net.mineproj.plugin.api.data.ProtocolPlugin;
+import net.mineproj.plugin.functionality.ballistics.Ballistics;
+import net.mineproj.plugin.functionality.ballistics.BallisticsPhys;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
 /*
