@@ -1,0 +1,6 @@
+name: PluginBase
+version: '1.0'
+main: net.mineproj.plugin.PluginBase
+authors: [pawsashatoy, Hxncus]
+api-version: '1.13'
+depend: [ ProtocolLib ]
