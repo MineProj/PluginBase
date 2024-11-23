@@ -4,7 +4,9 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.injector.temporary.TemporaryPlayer;
-import net.mineproj.plugin.api.listeners.MovementListener;
+import net.mineproj.plugin.protocol.data.PlayerProtocol;
+import net.mineproj.plugin.protocol.data.ProtocolPlugin;
+import net.mineproj.plugin.protocol.listeners.MovementListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -32,9 +34,12 @@ public class ProtocolTools {
             return new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
         }
     }
-    public static boolean isFlying(PacketEvent event) {
+    public static boolean isFlying(PacketEvent event, Location to, Location from) {
         PacketType p = event.getPacket().getType();
-        return
+        PlayerProtocol protocol = ProtocolPlugin.getProtocol(event.getPlayer());
+        if (p.equals(PacketType.Play.Client.POSITION) && to.toVector().equals(from.toVector()))
+            return true;
+        else return
         (
         p.equals(
         PacketType.Play.Client.FLYING)

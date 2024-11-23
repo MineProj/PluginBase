@@ -1,10 +1,9 @@
 package net.mineproj.plugin.functionality.ballistics;
 
 import lombok.Data;
-import net.mineproj.plugin.api.data.PlayerProtocol;
+import net.mineproj.plugin.protocol.data.PlayerProtocol;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 
 @Data
 public class Ballistics {
@@ -16,6 +15,7 @@ public class Ballistics {
     private float accuracy;
     private int damage;
     private float explosive;
+    private ExplosionType explosionType;
     private Particle particle;
     private Location location;
     private PlayerProtocol creator;
@@ -43,6 +43,7 @@ public class Ballistics {
         this.weightInterpolation = 0;
         this.heavy = false;
         this.explosive = 0;
+        this.explosionType = ExplosionType.VANILLA;
     }
 
     public Ballistics setCreator(PlayerProtocol player) {
@@ -52,6 +53,10 @@ public class Ballistics {
 
     public Ballistics setHeavy(boolean heavy) {
         this.heavy = heavy;
+        return this;
+    }
+    public Ballistics setExplosionType(ExplosionType explosionType) {
+        this.explosionType = explosionType;
         return this;
     }
 
@@ -70,6 +75,12 @@ public class Ballistics {
             this.weight += weightInterpolation;
             if (weightInterpolation < 0.25) weightInterpolation += 0.001;
         }
+    }
+
+    public enum ExplosionType {
+        VANILLA,
+        ATOMIC,
+        CHAIN_ATOMIC
     }
 
 }

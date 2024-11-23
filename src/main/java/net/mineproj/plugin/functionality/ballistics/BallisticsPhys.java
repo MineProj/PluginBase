@@ -2,11 +2,12 @@ package net.mineproj.plugin.functionality.ballistics;
 
 import lombok.experimental.UtilityClass;
 import net.mineproj.plugin.PluginBase;
-import net.mineproj.plugin.api.data.PlayerProtocol;
-import net.mineproj.plugin.api.data.ProtocolPlugin;
+import net.mineproj.plugin.core.AsyncScheduler;
+import net.mineproj.plugin.millennium.shapes.Circle;
+import net.mineproj.plugin.protocol.data.PlayerProtocol;
+import net.mineproj.plugin.protocol.data.ProtocolPlugin;
 import net.mineproj.plugin.millennium.math.BuildSpeed;
 import net.mineproj.plugin.millennium.math.GeneralMath;
-import net.mineproj.plugin.millennium.math.Interpolation;
 import net.mineproj.plugin.millennium.math.RayTrace;
 import net.mineproj.plugin.utils.BlockUtil;
 import org.bukkit.Bukkit;
@@ -115,7 +116,51 @@ public class BallisticsPhys {
 
     public static void explode(Ballistics ballistics, Location to) {
         if (ballistics.getExplosive() > 0) {
-            Bukkit.getScheduler().runTask(PluginBase.getInstance(), () -> to.getWorld().createExplosion(to, ballistics.getExplosive()));
+            Bukkit.getScheduler().runTask(PluginBase.getInstance(), () -> {
+                switch (ballistics.getExplosionType()) {
+                    case VANILLA ->
+                    to.getWorld()
+                    .createExplosion(to, ballistics.getExplosive());
+                    case ATOMIC -> {
+                        to.getWorld().createExplosion(to, 5);
+                        AsyncScheduler.run(() -> {
+                            for (int h = 1; h <= ballistics.getExplosive(); h++) {
+                                for (int r = 1; r <= 360; r += 10) {
+                                    Location calculatedLocation = to.clone();
+                                    calculatedLocation.add(
+                                    -GeneralMath.sin((float) Math.toRadians(r), BuildSpeed.FAST) * (h * 4),
+                                    4 + (h * 2),
+                                    GeneralMath.cos((float) Math.toRadians(r), BuildSpeed.FAST) * (h * 4));
+                                    add(new Ballistics((double) h / 2.0, h, h / 3.0, r, 90, 0, 50,
+                                                    ballistics.getParticle(),
+                                                    calculatedLocation)
+                                                    .setHeavy(true)
+                                                    .setExplosive(5)
+                                                    .setExplosionType(Ballistics.ExplosionType.VANILLA)
+                                                    .customWeight(0.5));
+                                }
+                            }
+                        });
+                    }
+                    case CHAIN_ATOMIC -> {
+                        to.getWorld()
+                        .createExplosion(to, 5);
+                        AsyncScheduler.run(() -> {
+                            if (ballistics.getExplosive() > 0) {
+                                for (int r = 1; r <= 360; r += 30) {
+                                    add(new Ballistics(1, 1, 1, r, -20, 0, 50,
+                                                    ballistics.getParticle(),
+                                                    to.clone().add(0, 1, 0))
+                                                    .setHeavy(true)
+                                                    .setExplosive(ballistics.getExplosive() - 1)
+                                                    .setExplosionType(Ballistics.ExplosionType.CHAIN_ATOMIC)
+                                                    .customWeight(0.3));
+                                }
+                            }
+                        });
+                    }
+                }
+            });
         }
     }
 

@@ -5,19 +5,19 @@ import net.mineproj.plugin.millennium.math.BuildSpeed;
 import net.mineproj.plugin.millennium.math.GeneralMath;
 import net.mineproj.plugin.millennium.vectors.Vec2;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /*
-Draw a circle to HashSet
+Draw a circle to ArrayList
  */
 
 @Data
 public class Circle {
-    private final Set<Vec2> vectors;
+    private final List<Vec2> vectors;
     public Circle() {
-        this.vectors = new HashSet<>();
+        this.vectors = new ArrayList<>();
     }
 
     // round
