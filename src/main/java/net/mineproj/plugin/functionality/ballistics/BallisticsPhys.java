@@ -3,6 +3,7 @@ package net.mineproj.plugin.functionality.ballistics;
 import lombok.experimental.UtilityClass;
 import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.core.AsyncScheduler;
+import net.mineproj.plugin.functionality.effects.EffectsPhys;
 import net.mineproj.plugin.millennium.shapes.Circle;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
 import net.mineproj.plugin.protocol.data.ProtocolPlugin;
@@ -15,6 +16,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
@@ -116,6 +120,11 @@ public class BallisticsPhys {
 
     public static void explode(Ballistics ballistics, Location to) {
         if (ballistics.getExplosive() > 0) {
+            if (ballistics.getEffect() != null) {
+                Location toAdd = ballistics.getEffect().getLocation().clone();
+                toAdd.setWorld(to.getWorld());
+                EffectsPhys.add(ballistics.getEffect().setLocation(to.clone().add(toAdd)));
+            }
             Bukkit.getScheduler().runTask(PluginBase.getInstance(), () -> {
                 switch (ballistics.getExplosionType()) {
                     case VANILLA ->

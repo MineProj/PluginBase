@@ -1,6 +1,7 @@
 package net.mineproj.plugin.functionality.ballistics;
 
 import lombok.Data;
+import net.mineproj.plugin.functionality.effects.Effect;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,6 +17,7 @@ public class Ballistics {
     private int damage;
     private float explosive;
     private ExplosionType explosionType;
+    private Effect effect;
     private Particle particle;
     private Location location;
     private PlayerProtocol creator;
@@ -44,10 +46,16 @@ public class Ballistics {
         this.heavy = false;
         this.explosive = 0;
         this.explosionType = ExplosionType.VANILLA;
+        this.effect = null;
     }
 
     public Ballistics setCreator(PlayerProtocol player) {
         this.creator = player;
+        return this;
+    }
+
+    public Ballistics setEffect(Effect effect) {
+        this.effect = effect;
         return this;
     }
 
