@@ -36,7 +36,6 @@ public class ActionListener extends PacketAdapter {
             if (typeString != null) {
                 if (type == AbilitiesEnum.PRESS_SHIFT_KEY) {
                     protocol.setSneaking(true);
-                    ShotTemplates.launchFireball(protocol.getPlayer());
                 } else if (type == AbilitiesEnum.RELEASE_SHIFT_KEY) {
                     protocol.setSneaking(false);
                 } else if (type == AbilitiesEnum.START_SPRINTING) {
