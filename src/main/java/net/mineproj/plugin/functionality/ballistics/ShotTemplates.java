@@ -2,8 +2,11 @@ package net.mineproj.plugin.functionality.ballistics;
 
 import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.functionality.effects.Effect;
+import net.mineproj.plugin.functionality.logic.CustomFireball;
 import net.mineproj.plugin.millennium.math.Interpolation;
+import net.mineproj.plugin.millennium.vectors.Vec2;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
+import net.mineproj.plugin.protocol.data.ProtocolPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -33,12 +36,12 @@ public class ShotTemplates {
                         new Ballistics(20, 30, 4,
                                         protocol.getLocation().getYaw(),
                                         protocol.getLocation().getPitch(),
-                                        0.05F, 8,
+                                        0.05F, 0,
                                         Particle.SONIC_BOOM,
                                         protocol.getLocation().clone().add(0, 1, 0))
                                         .setExplosive(10).setHeavy(true)
                                         .setExplosionType(Ballistics.ExplosionType.VELOCITY)
-                                        .customWeight(0.08).setVelocityRange(10).setEffect(effect));
+                                        .customWeight(0.08).setVelocityRange(15).setEffect(effect));
 
     }
 
@@ -71,26 +74,26 @@ public class ShotTemplates {
                                         0.001F, 0,
                                         Particle.LAVA,
                                         protocol.getLocation().clone().add(0, 1, 0))
-                                        .setExplosive(7).setHeavy(false)
+                                        .setExplosive(8).setHeavy(false)
                                         .setExplosionType(Ballistics.ExplosionType.VELOCITY)
-                                        .customWeight(0.0).setVelocityRange(6).setEffect(effect));
+                                        .customWeight(0.0).setVelocityRange(7).setEffect(effect));
         launchFireball(protocol.getPlayer());
     }
-    public static void fireShot(Location location) {
+    public static void fireShot(Location location, Vec2 direction) {
         Effect effect = new Effect(Effect.Type.CIRCULAR, Particle.FLAME,
                         new Location(null, 0, 0, 0), 5)
                         .circularAddAtFor(20).setSimple(true)
                         .setEase(Interpolation.Ease.OUT).setRadi(3);
         BallisticsPhys.add(
-                        new Ballistics(100, 200, 2,
-                                        0,
-                                        90,
+                        new Ballistics(100.0, 200, 2,
+                                        (float) direction.getX(),
+                                        (float) direction.getY(),
                                         0.0F, 0,
                                         Particle.LAVA,
                                         location)
-                                        .setExplosive(7).setHeavy(false)
+                                        .setExplosive(8).setHeavy(false)
                                         .setExplosionType(Ballistics.ExplosionType.VELOCITY)
-                                        .customWeight(0.0).setVelocityRange(6).setEffect(effect));
+                                        .customWeight(0.0).setVelocityRange(7).setEffect(effect));
     }
     public static void chainAtomicBombShot(PlayerProtocol protocol) {
         BallisticsPhys.add(
@@ -118,13 +121,15 @@ public class ShotTemplates {
     public static void launchFireball(Player player) {
         Location loc = player.getEyeLocation();
         Vector direction = loc.getDirection().normalize();
-
+        PlayerProtocol protocol = ProtocolPlugin.getProtocol(player);
         Bukkit.getScheduler().runTask(PluginBase.getInstance(), () -> {
             Fireball fireball = player.getWorld().spawn(loc.add(direction.multiply(2)), Fireball.class);
             fireball.setShooter(player);
             fireball.setVelocity(direction.multiply(1));
             fireball.setIsIncendiary(false);
             fireball.setYield(0);
+            CustomFireball.directional.put(fireball.getUniqueId(),
+                            new Vec2(protocol.getLocation().getYaw(), protocol.getLocation().getPitch()));
         });
     }
 }
