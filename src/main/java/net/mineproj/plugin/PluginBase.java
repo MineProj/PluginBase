@@ -4,11 +4,9 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
 import net.mineproj.plugin.core.AsyncScheduler;
+import net.mineproj.plugin.functionality.logic.CustomFireball;
 import net.mineproj.plugin.protocol.data.ProtocolPlugin;
-import net.mineproj.plugin.protocol.listeners.ActionListener;
-import net.mineproj.plugin.protocol.listeners.BlockPlaceFixerListener;
-import net.mineproj.plugin.protocol.listeners.MovementListener;
-import net.mineproj.plugin.protocol.listeners.VelocityListener;
+import net.mineproj.plugin.protocol.listeners.*;
 import net.mineproj.plugin.functionality.logic.Ticker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +28,17 @@ public final class PluginBase extends JavaPlugin {
     Consumes resources, turn it off if you don't need it
      */
     public final static boolean physProcessor = true;
+    /*
+    Custom fireball explosions!
+    Deal 0 damage, has own knockback logic.
+    You can shoot fireball by interact
+    with fire charge...
+    */
+    public final static boolean customFireballs = true;
+    /*
+    Check all player packets by debug!
+     */
+    public final static boolean debug = false;
 
     @Override
     public void onEnable() {
@@ -59,6 +68,13 @@ public final class PluginBase extends JavaPlugin {
 
         // Goofy
         m.addPacketListener(new BlockPlaceFixerListener());
+        if (customFireballs) {
+            Bukkit.getPluginManager().registerEvents(new CustomFireball(), this);
+            m.addPacketListener(new FireUpdaterListener());
+        }
+        if (debug) {
+            m.addPacketListener(new DebugListener());
+        }
     }
     private void runPhys() {
         if (!physProcessor) return;

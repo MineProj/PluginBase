@@ -19,6 +19,8 @@ public class Effect {
     private double radi;
     private double height;
 
+    private boolean isSimple;
+
     private Interpolation.Type interpolation;
     private Interpolation.Ease ease;
     public Effect(Type type, Particle particle, Location location, int time) {
@@ -33,11 +35,16 @@ public class Effect {
         this.ease = Interpolation.Ease.OUT;
         this.location = location;
         this.quality = 20;
+        this.isSimple = false;
     }
 
 
     public Effect setRadi(double radi) {
         this.radi = radi;
+        return this;
+    }
+    public Effect setSimple(boolean isSimple) {
+        this.isSimple = isSimple;
         return this;
     }
 

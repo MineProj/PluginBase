@@ -46,16 +46,19 @@ public class EffectsPhys {
                 if (effect.getType().equals(Effect.Type.CIRCULAR)) {
                     Location l = effect.getLocation().clone();
                     for (double v = -interpolateRadi; v <= interpolateRadi; v++) {
-                        double radiScale = Math.abs(v - interpolateRadi) / interpolateRadi;
-                        radiScale = 1 - radiScale;
+                        double radiScale = (Math.abs(interpolateRadi)) / effect.getRadi();
                         for (int angle = 0; angle <= 360; angle += effect.getQuality()) {
                             Location totalLocation = l.clone().add(
                                             -GeneralMath.sin((float) Math.toRadians(angle), BuildSpeed.FAST) * (interpolateRadi * radiScale),
                                             v,
                                             GeneralMath.cos((float) Math.toRadians(angle), BuildSpeed.FAST) * (interpolateRadi * radiScale)
                             );
-                            p(totalLocation.getWorld(), totalLocation,
-                                            effect.getParticle(), 1);
+                            if (effect.isSimple()) {
+                                p2(totalLocation, effect.getParticle());
+                            } else {
+                                p(totalLocation.getWorld(), totalLocation,
+                                                effect.getParticle(), 1);
+                            }
                         }
                     }
                 }
@@ -68,8 +71,12 @@ public class EffectsPhys {
                                             v,
                                             GeneralMath.cos((float) Math.toRadians(angle), BuildSpeed.FAST) * (interpolateRadi)
                             );
-                            p(totalLocation.getWorld(), totalLocation,
-                                            effect.getParticle(), 1);
+                            if (effect.isSimple()) {
+                                p2(totalLocation, effect.getParticle());
+                            } else {
+                                p(totalLocation.getWorld(), totalLocation,
+                                                effect.getParticle(), 1);
+                            }
                         }
                     }
                 }
@@ -126,6 +133,13 @@ public class EffectsPhys {
         // thread-safe
         Bukkit.getScheduler().runTask(PluginBase.getInstance(),
                         () -> Objects.requireNonNull(l.getWorld()).spawnParticle(p, l, 1, 0, 0, 0, 0));
+    }
+    private static void p2(Location l, Particle p) {
+        // thread-safe
+        Bukkit.getScheduler().runTask(PluginBase.getInstance(), () ->
+                        l.getWorld().spawnParticle(p, l, 1, 0, 0, 0, 0.01)
+        );
+
     }
     private static void pSplash(Location l, Particle p) {
         // thread-safe

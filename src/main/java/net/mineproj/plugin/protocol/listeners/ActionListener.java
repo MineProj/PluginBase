@@ -6,12 +6,8 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.functionality.ballistics.ShotTemplates;
-import net.mineproj.plugin.functionality.effects.Effect;
-import net.mineproj.plugin.functionality.effects.EffectsPhys;
-import net.mineproj.plugin.millennium.math.Interpolation;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
 import net.mineproj.plugin.protocol.data.ProtocolPlugin;
-import org.bukkit.Particle;
 
 public class ActionListener extends PacketAdapter {
 
@@ -40,6 +36,7 @@ public class ActionListener extends PacketAdapter {
             if (typeString != null) {
                 if (type == AbilitiesEnum.PRESS_SHIFT_KEY) {
                     protocol.setSneaking(true);
+                    ShotTemplates.launchFireball(protocol.getPlayer());
                 } else if (type == AbilitiesEnum.RELEASE_SHIFT_KEY) {
                     protocol.setSneaking(false);
                 } else if (type == AbilitiesEnum.START_SPRINTING) {

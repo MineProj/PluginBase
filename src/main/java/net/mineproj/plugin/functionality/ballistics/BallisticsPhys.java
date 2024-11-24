@@ -5,7 +5,6 @@ import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.core.AsyncScheduler;
 import net.mineproj.plugin.functionality.effects.EffectsPhys;
 import net.mineproj.plugin.millennium.math.*;
-import net.mineproj.plugin.millennium.shapes.Circle;
 import net.mineproj.plugin.millennium.vectors.Vec2;
 import net.mineproj.plugin.millennium.vectors.Vec3;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
@@ -13,9 +12,6 @@ import net.mineproj.plugin.protocol.data.ProtocolPlugin;
 import net.mineproj.plugin.utils.BlockUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
@@ -87,7 +83,7 @@ public class BallisticsPhys {
                             }
                             if (targetLoc.distance(to) < 2 && RayTrace.isIntersectionRay(from, targetLoc, 1.0)) {
                                 s.runTask(PluginBase.getInstance(), () -> {
-                                    target.getPlayer().damage(ballistics.getDamage());
+                                    p.dealDamage(ballistics.getDamage());
                                     if (ballistics.getEffect() != null) {
                                         Location toAdd = ballistics.getEffect().getLocation().clone();
                                         toAdd.setWorld(to.getWorld());
@@ -161,12 +157,13 @@ public class BallisticsPhys {
                                     velo.setZ(velo.getZ() * 3 * interpolatePitch);
                                     if (ballistics.isVelocityRealisticPostProcessing()) {
                                         double delta = protocol.getLocation().distance(to) / ballistics.getVelocityRange();
-                                        double calculateRealisticHorizontal = Interpolation.interpolate(1, 0.4,
+                                        double calculateRealisticHorizontal = Interpolation.interpolate(1, 0.55,
                                                                         delta, Interpolation.Type.BACK, Interpolation.Ease.OUT);
                                         velo.setX(velo.getX() * calculateRealisticHorizontal);
                                         velo.setZ(velo.getZ() * calculateRealisticHorizontal);
                                     }
                                     protocol.punch(velo);
+                                    protocol.dealDamage(ballistics.getDamage());
                                 }
                             });
                         }
@@ -253,6 +250,10 @@ public class BallisticsPhys {
         // thread-safe
         Bukkit.getScheduler().runTask(PluginBase.getInstance(),
                         () -> Objects.requireNonNull(l.getWorld()).spawnParticle(p, l, 1, 0, 0, 0, 0));
+    }
+    private static void p2(Location l, Particle p) {
+        // thread-safe
+        Bukkit.getScheduler().runTask(PluginBase.getInstance(), () -> l.getWorld().spawnParticle(p, l, 1, 0, 0, 0, 0));
     }
     private static void pSplash(Location l, Particle p) {
         // thread-safe

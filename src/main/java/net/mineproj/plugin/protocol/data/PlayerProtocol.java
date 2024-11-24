@@ -4,9 +4,11 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import lombok.Data;
+import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.protocol.analyzer.modules.AnalyzerVL;
 import net.mineproj.plugin.protocol.analyzer.modules.TimerBalancer;
 import net.mineproj.plugin.utils.ProtocolTools;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -76,5 +78,11 @@ public class PlayerProtocol {
                         .write(2, (int) (velocity.getY() * 8000))
                         .write(3, (int) (velocity.getZ() * 8000));
         protocolManager.sendServerPacket(this.player, velocityPacket);
+    }
+    public void dealDamage(double d) {
+        if (d == 0.0) return;
+        Bukkit.getScheduler().runTask(PluginBase.getInstance(), () -> {
+            this.getPlayer().damage(d);
+        });
     }
 }
