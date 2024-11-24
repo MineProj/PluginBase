@@ -20,9 +20,10 @@ public class ShotTemplates {
                                         .customWeight(0.01));
     }
     public static void sonicCannonShot(PlayerProtocol protocol) {
-        Effect effect = new Effect(Effect.Type.CIRCULAR, Particle.ENCHANTED_HIT,
+        Effect effect = new Effect(Effect.Type.WAVE, Particle.ENCHANTED_HIT,
                         new Location(null, 0, 0, 0), 8)
-                        .setEase(Interpolation.Ease.IN_OUT).setRadi(7);
+                        .circularAddAtFor(20).setHeight(8)
+                        .setEase(Interpolation.Ease.IN).setRadi(16);
         BallisticsPhys.add(
                         new Ballistics(20, 30, 4,
                                         protocol.getLocation().getYaw(),
@@ -30,8 +31,9 @@ public class ShotTemplates {
                                         0.05F, 12,
                                         Particle.SONIC_BOOM,
                                         protocol.getLocation().clone().add(0, 1, 0))
-                                        .setExplosive(3).setHeavy(true)
-                                        .customWeight(0.08).setEffect(effect));
+                                        .setExplosive(7).setHeavy(true)
+                                        .setExplosionType(Ballistics.ExplosionType.VELOCITY)
+                                        .customWeight(0.08).setVelocityRange(10).setEffect(effect));
 
     }
     public static void chainAtomicBombShot(PlayerProtocol protocol) {

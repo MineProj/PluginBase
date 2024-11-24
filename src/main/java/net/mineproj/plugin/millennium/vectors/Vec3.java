@@ -1,5 +1,7 @@
 package net.mineproj.plugin.millennium.vectors;
 
+import org.bukkit.Location;
+
 public class Vec3
 {
     /** X coordinate of Vec3D */
@@ -31,6 +33,12 @@ public class Vec3
         this.xCoord = x;
         this.yCoord = y;
         this.zCoord = z;
+    }
+
+    public Vec3(Location location) {
+        this.xCoord = location.getX();
+        this.yCoord = location.getY();
+        this.zCoord = location.getZ();
     }
 
     /**

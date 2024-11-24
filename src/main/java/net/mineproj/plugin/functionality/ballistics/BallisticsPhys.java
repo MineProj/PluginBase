@@ -4,17 +4,14 @@ import lombok.experimental.UtilityClass;
 import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.core.AsyncScheduler;
 import net.mineproj.plugin.functionality.effects.EffectsPhys;
+import net.mineproj.plugin.millennium.math.*;
 import net.mineproj.plugin.millennium.shapes.Circle;
+import net.mineproj.plugin.millennium.vectors.Vec2;
+import net.mineproj.plugin.millennium.vectors.Vec3;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
 import net.mineproj.plugin.protocol.data.ProtocolPlugin;
-import net.mineproj.plugin.millennium.math.BuildSpeed;
-import net.mineproj.plugin.millennium.math.GeneralMath;
-import net.mineproj.plugin.millennium.math.RayTrace;
 import net.mineproj.plugin.utils.BlockUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -74,6 +71,11 @@ public class BallisticsPhys {
 
                     if (isHitBlock(to)) {
                         ballistics.setLiving(false);
+                        if (ballistics.getEffect() != null) {
+                            Location toAdd = ballistics.getEffect().getLocation().clone();
+                            toAdd.setWorld(to.getWorld());
+                            EffectsPhys.add(ballistics.getEffect().setLocation(to.clone().add(toAdd)));
+                        }
                         explode(ballistics, to);
                         break;
                     } else {
@@ -86,6 +88,11 @@ public class BallisticsPhys {
                             if (targetLoc.distance(to) < 2 && RayTrace.isIntersectionRay(from, targetLoc, 1.0)) {
                                 s.runTask(PluginBase.getInstance(), () -> {
                                     target.getPlayer().damage(ballistics.getDamage());
+                                    if (ballistics.getEffect() != null) {
+                                        Location toAdd = ballistics.getEffect().getLocation().clone();
+                                        toAdd.setWorld(to.getWorld());
+                                        EffectsPhys.add(ballistics.getEffect().setLocation(to.clone().add(toAdd)));
+                                    }
                                     explode(ballistics, to);
                                     ballistics.setLiving(false);
                                 });
@@ -120,16 +127,50 @@ public class BallisticsPhys {
 
     public static void explode(Ballistics ballistics, Location to) {
         if (ballistics.getExplosive() > 0) {
-            if (ballistics.getEffect() != null) {
-                Location toAdd = ballistics.getEffect().getLocation().clone();
-                toAdd.setWorld(to.getWorld());
-                EffectsPhys.add(ballistics.getEffect().setLocation(to.clone().add(toAdd)));
-            }
             Bukkit.getScheduler().runTask(PluginBase.getInstance(), () -> {
                 switch (ballistics.getExplosionType()) {
                     case VANILLA ->
                     to.getWorld()
                     .createExplosion(to, ballistics.getExplosive());
+                    case VELOCITY -> {
+                        World w = to.getWorld();
+                        for (Player player : w.getPlayers()) {
+                            AsyncScheduler.run(() -> {
+                                PlayerProtocol protocol = ProtocolPlugin.getProtocol(player);
+                                if (protocol.getLocation().distance(to) <= ballistics.getVelocityRange()) {
+                                    double calculateRealisticVertical = 0;
+                                    if (ballistics.isVelocityRealisticPostProcessing()) {
+                                        double delta = protocol.getLocation().getY() - to.getY();
+                                        calculateRealisticVertical = (delta >= 1.0) ? 0 :
+                                                        Interpolation.interpolate(0.5, 1,
+                                                        delta, Interpolation.Type.BACK, Interpolation.Ease.OUT);
+                                    }
+                                    Vec2 vec = Euler.calculateVec2Vec(new Vec3(to),
+                                                    new Vec3(protocol.getLocation().clone().add(0, calculateRealisticVertical, 0)));
+                                    Vector velo = new Vector(
+                                                    -GeneralMath.sin(
+                                                                    (float) Math.toRadians(vec.getX())
+                                                                    , BuildSpeed.FAST),
+                                                    -GeneralMath.sin(
+                                                                    (float) Math.toRadians(vec.getY()), BuildSpeed.FAST),
+                                                    GeneralMath.cos(
+                                                                    (float) Math.toRadians(vec.getX())
+                                                                    , BuildSpeed.FAST)).multiply(ballistics.getExplosive() / 5);
+                                    double interpolatePitch = 1 - ((Math.abs(vec.getY())) / 90);
+                                    velo.setX(velo.getX() * 3 * interpolatePitch);
+                                    velo.setZ(velo.getZ() * 3 * interpolatePitch);
+                                    if (ballistics.isVelocityRealisticPostProcessing()) {
+                                        double delta = protocol.getLocation().distance(to) / ballistics.getVelocityRange();
+                                        double calculateRealisticHorizontal = Interpolation.interpolate(1, 0.4,
+                                                                        delta, Interpolation.Type.BACK, Interpolation.Ease.OUT);
+                                        velo.setX(velo.getX() * calculateRealisticHorizontal);
+                                        velo.setZ(velo.getZ() * calculateRealisticHorizontal);
+                                    }
+                                    protocol.punch(velo);
+                                }
+                            });
+                        }
+                    }
                     case ATOMIC -> {
                         to.getWorld().createExplosion(to, 5);
                         AsyncScheduler.run(() -> {

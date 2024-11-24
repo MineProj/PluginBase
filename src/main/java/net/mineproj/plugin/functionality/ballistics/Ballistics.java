@@ -11,6 +11,7 @@ public class Ballistics {
     private double distance;
     private double targetDistance;
     private double speed;
+    private double velocityRange;
     private float yaw;
     private float pitch;
     private float accuracy;
@@ -24,6 +25,7 @@ public class Ballistics {
 
     private boolean living;
     private boolean heavy;
+    private boolean velocityRealisticPostProcessing;
 
     private double weight, weightInterpolation;
 
@@ -47,6 +49,8 @@ public class Ballistics {
         this.explosive = 0;
         this.explosionType = ExplosionType.VANILLA;
         this.effect = null;
+        this.velocityRange = 5;
+        this.velocityRealisticPostProcessing = true;
     }
 
     public Ballistics setCreator(PlayerProtocol player) {
@@ -63,6 +67,10 @@ public class Ballistics {
         this.heavy = heavy;
         return this;
     }
+    public Ballistics setVelocityRange(double velocityRange) {
+        this.velocityRange = velocityRange;
+        return this;
+    }
     public Ballistics setExplosionType(ExplosionType explosionType) {
         this.explosionType = explosionType;
         return this;
@@ -77,6 +85,10 @@ public class Ballistics {
         this.weight = w;
         return this;
     }
+    public Ballistics setVelocityRPP(boolean velocityRealisticPostProcessing) {
+        this.velocityRealisticPostProcessing = velocityRealisticPostProcessing;
+        return this;
+    }
 
     public void outOfDistance() {
         if (this.weight < 2.4) {
@@ -87,6 +99,7 @@ public class Ballistics {
 
     public enum ExplosionType {
         VANILLA,
+        VELOCITY,
         ATOMIC,
         CHAIN_ATOMIC
     }

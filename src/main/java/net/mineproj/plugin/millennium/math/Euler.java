@@ -32,7 +32,7 @@ public class Euler {
         return angleDiff;
     }
 
-    public Vec2 calculateVec2Vec(final Vec3 from, final Vec3 to) {
+    public static Vec2 calculateVec2Vec(final Vec3 from, final Vec3 to) {
         final Vec3 diff = to.subtract(from);
         final double distance = Math.hypot(diff.xCoord, diff.zCoord);
         final float yaw = (float) (Math.atan2(diff.zCoord, diff.xCoord) * 180.0F / PI) - 90.0F;
@@ -40,7 +40,7 @@ public class Euler {
         return new Vec2(yaw, pitch);
     }
 
-    public Vec2 calculateRotationToVec(final Vec3 pos) {
+    public static Vec2 calculateRotationToVec(final Vec3 pos) {
         final float deltaX = (float) pos.xCoord;
         final float deltaY = (float) pos.yCoord;
         final float deltaZ = (float) pos.zCoord;
