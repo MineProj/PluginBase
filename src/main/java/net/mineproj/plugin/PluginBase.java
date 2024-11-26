@@ -4,7 +4,9 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
 import net.mineproj.plugin.core.AsyncScheduler;
+import net.mineproj.plugin.functionality.commands.WsCommand;
 import net.mineproj.plugin.functionality.logic.CustomFireball;
+import net.mineproj.plugin.functionality.logic.DisableFallDamage;
 import net.mineproj.plugin.protocol.data.ProtocolPlugin;
 import net.mineproj.plugin.protocol.listeners.*;
 import net.mineproj.plugin.functionality.logic.Ticker;
@@ -36,6 +38,10 @@ public final class PluginBase extends JavaPlugin {
     */
     public final static boolean customFireballs = true;
     /*
+    Simple, right? Just disable fall damage
+    */
+    public final static boolean disableFallDamage = true;
+    /*
     Check all player packets by debug!
      */
     public final static boolean debug = false;
@@ -45,6 +51,7 @@ public final class PluginBase extends JavaPlugin {
         instance = this;
         this.runListeners();
         this.runPhys();
+        this.initializeCommands();
         { // Your logic
 
         }
@@ -53,6 +60,10 @@ public final class PluginBase extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    private void initializeCommands() {
+        this.getCommand("ws").setExecutor(new WsCommand());
     }
 
     private void runListeners() {
@@ -71,6 +82,9 @@ public final class PluginBase extends JavaPlugin {
         if (customFireballs) {
             Bukkit.getPluginManager().registerEvents(new CustomFireball(), this);
             m.addPacketListener(new FireUpdaterListener());
+        }
+        if (disableFallDamage) {
+            Bukkit.getPluginManager().registerEvents(new DisableFallDamage(), this);
         }
         if (debug) {
             m.addPacketListener(new DebugListener());

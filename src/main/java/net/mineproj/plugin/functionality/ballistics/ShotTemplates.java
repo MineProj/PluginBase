@@ -29,7 +29,7 @@ public class ShotTemplates {
     }
     public static void sonicCannonShot(PlayerProtocol protocol) {
         Effect effect = new Effect(Effect.Type.WAVE, Particle.ENCHANTED_HIT,
-                        new Location(null, 0, 0, 0), 8)
+                        new Location(null, 0, 0, 0), 13)
                         .circularAddAtFor(20).setHeight(8)
                         .setEase(Interpolation.Ease.IN).setRadi(16);
         BallisticsPhys.add(
@@ -39,9 +39,9 @@ public class ShotTemplates {
                                         0.05F, 0,
                                         Particle.SONIC_BOOM,
                                         protocol.getLocation().clone().add(0, 1, 0))
-                                        .setExplosive(10).setHeavy(true)
+                                        .setExplosive(9).setHeavy(true).setCreator(protocol)
                                         .setExplosionType(Ballistics.ExplosionType.VELOCITY)
-                                        .customWeight(0.08).setVelocityRange(15).setEffect(effect));
+                                        .customWeight(0.08).setVelocityRange(13).setEffect(effect));
 
     }
 
@@ -57,7 +57,7 @@ public class ShotTemplates {
                                         0.05F, 8,
                                         Particle.SMALL_FLAME,
                                         protocol.getLocation().clone().add(0, 1, 0))
-                                        .setExplosive(3).setHeavy(true)
+                                        .setExplosive(3).setHeavy(true).setCreator(protocol)
                                         .setExplosionType(Ballistics.ExplosionType.VELOCITY)
                                         .customWeight(0.1).setVelocityRange(4).setEffect(effect));
 
@@ -74,7 +74,7 @@ public class ShotTemplates {
                                         0.001F, 0,
                                         Particle.LAVA,
                                         protocol.getLocation().clone().add(0, 1, 0))
-                                        .setExplosive(8).setHeavy(false)
+                                        .setExplosive(8).setHeavy(false).setCreator(protocol)
                                         .setExplosionType(Ballistics.ExplosionType.VELOCITY)
                                         .customWeight(0.0).setVelocityRange(7).setEffect(effect));
         launchFireball(protocol.getPlayer());

@@ -3,6 +3,7 @@ package net.mineproj.plugin.services;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,22 +12,30 @@ import java.nio.file.StandardCopyOption;
 
 
 public class WorldService {
-    public World createWorld(String worldName, int sessionId) {
+    public World createWorld(String worldName, String totalName) {
         File worldFolder = new File(Bukkit.getWorldContainer(), worldName);
-        File targetWorld = new File(Bukkit.getWorldContainer(), "session_" + sessionId);
+        File targetWorld = new File(Bukkit.getWorldContainer(), totalName);
         World world = null;
         World gameWorld = null;
         if (worldFolder.exists()) {
             WorldCreator worldCreator = new WorldCreator(worldName);
             world = Bukkit.createWorld(worldCreator);
             copyWorld(worldFolder, targetWorld);
-            WorldCreator worldCreatorCopy = new WorldCreator("session_" + sessionId);
+            WorldCreator worldCreatorCopy = new WorldCreator(totalName);
             gameWorld = Bukkit.createWorld(worldCreatorCopy);
             return (world != null) ? gameWorld : null;
         } else {
             return null;
         }
     }
+
+    public World createEmptyWorld(String worldName) {
+        WorldCreator worldCreator = new WorldCreator(worldName);
+        worldCreator.type(WorldType.FLAT);
+        worldCreator.generatorSettings("{\"layers\":[]}");
+        return Bukkit.createWorld(worldCreator);
+    }
+
     public boolean deleteWorld(String worldName) {
         World world = Bukkit.getWorld(worldName);
 

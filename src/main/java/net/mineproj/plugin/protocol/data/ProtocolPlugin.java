@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtocolPlugin extends PacketAdapter implements Listener {
 
-    private static final Map<UUID, PlayerProtocol> container = new ConcurrentHashMap<>();
+    private static final Map<Player, PlayerProtocol> container = new ConcurrentHashMap<>();
     public ProtocolPlugin() {
         super(
                         PluginBase.getInstance(),
@@ -26,21 +26,18 @@ public class ProtocolPlugin extends PacketAdapter implements Listener {
     }
 
     public static PlayerProtocol getProtocol(Player player) {
-        return container.get(player.getUniqueId());
-    }
-    public static PlayerProtocol getProtocol(UUID uuid) {
-        return container.get(uuid);
+        return container.get(player);
     }
     @Override
     public void onPacketSending(PacketEvent event) {
         container.put(
-                        event.getPlayer().getUniqueId(),
+                        event.getPlayer(),
                         new PlayerProtocol(event.getPlayer())
         );
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        container.remove(event.getPlayer().getUniqueId());
+        container.remove(event.getPlayer());
     }
 }

@@ -4,3 +4,8 @@ main: net.mineproj.plugin.PluginBase
 authors: [pawsashatoy, Hxncus]
 api-version: '1.13'
 depend: [ ProtocolLib ]
+commands:
+  ws:
+    description: "World Service"
+    usage: "/ws"
+    permission: "mp.admin"

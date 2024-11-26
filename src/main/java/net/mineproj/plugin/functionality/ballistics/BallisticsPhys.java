@@ -44,9 +44,8 @@ public class BallisticsPhys {
                 }
 
                 PlayerProtocol creator = ballistics.getCreator();
-                final List<Player> cachedPlayers =
-                                (creator == null) ? new ArrayList<>()
-                                : creator.getLocation().getWorld().getPlayers().stream().toList();
+
+                final List<Player> cachedPlayers = ballistics.getLocation().getWorld().getPlayers().stream().toList();
                 final float yaw = ballistics.getYaw();
                 final float pitch = ballistics.getPitch();
 
@@ -78,7 +77,7 @@ public class BallisticsPhys {
                         for (Player target : cachedPlayers) {
                             PlayerProtocol p = ProtocolPlugin.getProtocol(target);
                             Location targetLoc = p.getLocation();
-                            if (target.getName().hashCode() == creator.getPlayer().getName().hashCode()) {
+                            if (creator != null && target.getName().hashCode() == creator.getPlayer().getName().hashCode()) {
                                 continue;
                             }
                             if (targetLoc.distance(to) < 2 && RayTrace.isIntersectionRay(from, targetLoc, 1.0)) {
@@ -130,8 +129,8 @@ public class BallisticsPhys {
                     .createExplosion(to, ballistics.getExplosive());
                     case VELOCITY -> {
                         World w = to.getWorld();
-                        for (Player player : w.getPlayers()) {
-                            AsyncScheduler.run(() -> {
+                        AsyncScheduler.run(() -> {
+                            for (Player player : w.getPlayers()) {
                                 PlayerProtocol protocol = ProtocolPlugin.getProtocol(player);
                                 if (protocol.getLocation().distance(to) <= ballistics.getVelocityRange()) {
                                     double calculateRealisticVertical = 0;
@@ -139,7 +138,7 @@ public class BallisticsPhys {
                                         double delta = protocol.getLocation().getY() - to.getY();
                                         calculateRealisticVertical = (delta >= 1.0) ? 0 :
                                                         Interpolation.interpolate(0.5, 1,
-                                                        delta, Interpolation.Type.BACK, Interpolation.Ease.OUT);
+                                                                        delta, Interpolation.Type.BACK, Interpolation.Ease.OUT);
                                     }
                                     Vec2 vec = Euler.calculateVec2Vec(new Vec3(to),
                                                     new Vec3(protocol.getLocation().clone().add(0, calculateRealisticVertical, 0)));
@@ -158,15 +157,15 @@ public class BallisticsPhys {
                                     if (ballistics.isVelocityRealisticPostProcessing()) {
                                         double delta = protocol.getLocation().distance(to) / ballistics.getVelocityRange();
                                         double calculateRealisticHorizontal = Interpolation.interpolate(1, 0.55,
-                                                                        delta, Interpolation.Type.BACK, Interpolation.Ease.OUT);
+                                                        delta, Interpolation.Type.BACK, Interpolation.Ease.OUT);
                                         velo.setX(velo.getX() * calculateRealisticHorizontal);
                                         velo.setZ(velo.getZ() * calculateRealisticHorizontal);
                                     }
                                     protocol.punch(velo);
                                     protocol.dealDamage(ballistics.getDamage());
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                     case ATOMIC -> {
                         to.getWorld().createExplosion(to, 5);
