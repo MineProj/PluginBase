@@ -18,7 +18,7 @@ public class Ballistics {
     private int damage;
     private float explosive;
     private ExplosionType explosionType;
-    private Effect effect;
+    private Effect effect, semiEffect;
     private Particle particle;
     private Location location;
     private PlayerProtocol creator;
@@ -49,6 +49,7 @@ public class Ballistics {
         this.explosive = 0;
         this.explosionType = ExplosionType.VANILLA;
         this.effect = null;
+        this.semiEffect = null;
         this.velocityRange = 5;
         this.velocityRealisticPostProcessing = true;
     }

@@ -86,7 +86,15 @@ public class BallisticsPhys {
                                     if (ballistics.getEffect() != null) {
                                         Location toAdd = ballistics.getEffect().getLocation().clone();
                                         toAdd.setWorld(to.getWorld());
-                                        EffectsPhys.add(ballistics.getEffect().setLocation(to.clone().add(toAdd)));
+                                        if (ballistics.getSemiEffect() != null) {
+                                            if (!to.getNearbyEntitiesByType(Player.class, 2).isEmpty()) {
+                                                EffectsPhys.add(ballistics.getSemiEffect().setLocation(to.clone().add(toAdd)));
+                                            } else {
+                                                EffectsPhys.add(ballistics.getEffect().setLocation(to.clone().add(toAdd)));
+                                            }
+                                        } else {
+                                            EffectsPhys.add(ballistics.getEffect().setLocation(to.clone().add(toAdd)));
+                                        }
                                     }
                                     explode(ballistics, to);
                                     ballistics.setLiving(false);

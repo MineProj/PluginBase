@@ -2,12 +2,14 @@ package net.mineproj.plugin.functionality.ballistics;
 
 import net.mineproj.plugin.PluginBase;
 import net.mineproj.plugin.functionality.effects.Effect;
+import net.mineproj.plugin.functionality.effects.EffectsPhys;
 import net.mineproj.plugin.functionality.logic.CustomFireball;
 import net.mineproj.plugin.millennium.math.Interpolation;
 import net.mineproj.plugin.millennium.vectors.Vec2;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
 import net.mineproj.plugin.protocol.data.ProtocolPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Fireball;
@@ -80,20 +82,36 @@ public class ShotTemplates {
         launchFireball(protocol.getPlayer());
     }
     public static void fireShot(Location location, Vec2 direction) {
-        Effect effect = new Effect(Effect.Type.CIRCULAR, Particle.FLAME,
+        /*
+        Effect semiEffect = new Effect(Effect.Type.RING, Particle.FLAME,
                         new Location(null, 0, 0, 0), 5)
                         .circularAddAtFor(20).setSimple(true)
                         .setEase(Interpolation.Ease.OUT).setRadi(3);
-        BallisticsPhys.add(
-                        new Ballistics(100.0, 200, 2,
-                                        (float) direction.getX(),
-                                        (float) direction.getY(),
-                                        0.0F, 0,
-                                        Particle.LAVA,
-                                        location)
-                                        .setExplosive(8).setHeavy(false)
-                                        .setExplosionType(Ballistics.ExplosionType.VELOCITY)
-                                        .customWeight(0.0).setVelocityRange(7).setEffect(effect));
+        semiEffect.setRadiFrom(0.3);
+        semiEffect.setRadiTo(3);
+         */
+        Effect effect = new Effect(
+                        Effect.Type.RING, Particle.FLAME,
+                        new Location(location.getWorld(), 0, 1.5, 0), 25)
+                        .setSimple(true).setRadi(1.5).setRotationPitch(3.0f);
+        effect.setQuality(12);
+        effect.setCustomSpeed(0);
+        effect.setIntepolation(Interpolation.Type.CIRC);
+        effect.setEase(Interpolation.Ease.OUT);
+        effect.setRadiFrom(0.2);
+        effect.setRadiTo(1.6);
+        effect.setChance(0.5);
+        // add
+        Ballistics ballistics = new Ballistics(100.0, 200, 2,
+                        (float) direction.getX(),
+                        (float) direction.getY(),
+                        0.0F, 0,
+                        Particle.LAVA,
+                        location)
+                        .setExplosive(8).setHeavy(false)
+                        .setExplosionType(Ballistics.ExplosionType.VELOCITY)
+                        .customWeight(0.0).setVelocityRange(7).setEffect(effect);
+        BallisticsPhys.add(ballistics);
     }
     public static void chainAtomicBombShot(PlayerProtocol protocol) {
         BallisticsPhys.add(
