@@ -5,6 +5,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import net.mineproj.plugin.PluginBase;
+import net.mineproj.plugin.events.bridge.ClientPacketRegister;
 import net.mineproj.plugin.functionality.ballistics.ShotTemplates;
 import net.mineproj.plugin.functionality.effects.Effect;
 import net.mineproj.plugin.functionality.effects.EffectsPhys;
@@ -15,7 +16,7 @@ import org.bukkit.Particle;
 
 public class ActionListener extends PacketAdapter {
 
-    private enum AbilitiesEnum {
+    public enum AbilitiesEnum {
         START_SPRINTING,
         STOP_SPRINTING,
         PRESS_SHIFT_KEY,
@@ -48,6 +49,8 @@ public class ActionListener extends PacketAdapter {
                     protocol.setSprinting(false);
                 }
             }
+
+            ClientPacketRegister.run(type);
         }
     }
 

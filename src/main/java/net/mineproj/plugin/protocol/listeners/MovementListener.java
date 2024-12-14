@@ -6,10 +6,10 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import net.mineproj.plugin.PluginBase;
+import net.mineproj.plugin.events.bridge.ClientPacketRegister;
 import net.mineproj.plugin.protocol.analyzer.checks.TickRateCheck;
 import net.mineproj.plugin.protocol.data.PlayerProtocol;
 import net.mineproj.plugin.protocol.data.ProtocolPlugin;
-import net.mineproj.plugin.events.bridge.MovementEvent;
 import net.mineproj.plugin.events.template.PlayerTickEvent;
 import net.mineproj.plugin.events.template.SuperPositionPacketEvent;
 import net.mineproj.plugin.utils.ProtocolTools;
@@ -70,7 +70,7 @@ public class MovementListener extends PacketAdapter {
         if (PluginBase.protocolAnalyzer)
             TickRateCheck.check(tickEvent);
 
-        MovementEvent.tick(tickEvent);
+        ClientPacketRegister.run(tickEvent);
 
         if (!ProtocolTools.getWorld(player).getName().equals(p.getFromWorld())) {
             p.setFromWorld(ProtocolTools.getWorld(player).getName());
@@ -129,7 +129,8 @@ public class MovementListener extends PacketAdapter {
                             p.getLocation()
             );
             moveEvent.setCancelled(event.isCancelled());
-            MovementEvent.move(moveEvent, true);
+
+            ClientPacketRegister.run(moveEvent);
 
             //player.sendMessage("event: " + moveEvent.getTo().toVector());
         } else {
